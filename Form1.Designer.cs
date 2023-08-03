@@ -62,23 +62,24 @@
             dgv.Name = "dgv";
             dgv.RowHeadersWidth = 51;
             dgv.RowTemplate.Height = 29;
-            dgv.Size = new Size(479, 343);
+            dgv.Size = new Size(757, 487);
             dgv.TabIndex = 3;
             // 
             // TableList
             // 
             TableList.FormattingEnabled = true;
             TableList.ItemHeight = 20;
-            TableList.Location = new Point(33, 12);
+            TableList.Location = new Point(37, 16);
             TableList.Name = "TableList";
-            TableList.Size = new Size(193, 404);
+            TableList.Size = new Size(193, 544);
             TableList.TabIndex = 4;
+            TableList.SelectedIndexChanged += TableList_SelectedIndexChanged;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(1069, 602);
             Controls.Add(TableList);
             Controls.Add(dgv);
             Controls.Add(save_btn);
