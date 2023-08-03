@@ -9,7 +9,6 @@ namespace DbAdapterAppHw
     {
         private string connString = string.Empty;
         private SqlConnection? conn = null;
-        private DataTable dt;
         public Form1()
         {
             InitializeComponent();
@@ -19,8 +18,6 @@ namespace DbAdapterAppHw
                 .ConnectionString;
 
             conn = new SqlConnection(connString);
-
-            dt = new DataTable();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -30,29 +27,32 @@ namespace DbAdapterAppHw
 
         private void Fill_btn_Click(object sender, EventArgs e)
         {
-            try
+            using (conn = new SqlConnection(connString))
             {
-                conn.Open();
+                try
+                {
+                    conn.Open();
 
-                string query = $"SELECT * FROM users";
+                    string query = $"SELECT * FROM users";
 
-                SqlCommand cmd = new SqlCommand(query, conn);
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    using SqlDataReader reader = cmd.ExecuteReader();
+                    DataTable dt = new DataTable();
 
-                using SqlDataReader reader = cmd.ExecuteReader();
+                    dt.Load(reader);
 
-                dt.Load(reader);
+                    dgv.DataSource = dt;
 
-                dgv.DataSource = dt;
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"ERROR: {ex.Message}");
-            }
-            finally
-            {
-                if (conn is not null && conn.State == System.Data.ConnectionState.Open)
-                    conn.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"ERROR: {ex.Message}");
+                }
+                finally
+                {
+                    if (conn is not null && conn.State == System.Data.ConnectionState.Open)
+                        conn.Close();
+                }
             }
         }
 
@@ -65,19 +65,23 @@ namespace DbAdapterAppHw
         {
             try
             {
-                conn.Open();
+                using (conn = new SqlConnection(connString))
+                {
+                    conn.Open();
 
-                string query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
+                    string query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
 
-                SqlCommand cmd = new SqlCommand(query, conn);
+                    SqlCommand cmd = new SqlCommand(query, conn);
 
-                using SqlDataReader reader = cmd.ExecuteReader();
+                    using SqlDataReader reader = cmd.ExecuteReader();
+                    DataTable dt = new DataTable();
 
-                dt.Load(reader);
+                    dt.Load(reader);
 
-                TableList.DataSource = dt;
-                TableList.DisplayMember = "TABLE_NAME";
-                TableList.ValueMember = "TABLE_NAME";
+                    TableList.DataSource = dt;
+                    TableList.DisplayMember = "TABLE_NAME";
+                    TableList.ValueMember = "TABLE_NAME";
+                }
 
             }
             catch (Exception ex)
