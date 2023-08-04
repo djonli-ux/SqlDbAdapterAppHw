@@ -1,8 +1,11 @@
+using DbAdapterAppHw;
 using Microsoft.Data.SqlClient;
+using Microsoft.VisualBasic.ApplicationServices;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DbAdapterAppHw
 {
@@ -11,8 +14,8 @@ namespace DbAdapterAppHw
         private string? selectedTableName = string.Empty;
         private string connString = string.Empty;
         private SqlConnection? conn = null;
-        private SqlDataAdapter adapter;
-        private DataSet ds;
+        private SqlDataAdapter? adapter = null;
+        private DataSet? ds = null;
         public Form1()
         {
             InitializeComponent();
@@ -36,10 +39,12 @@ namespace DbAdapterAppHw
                 dgv.DataSource = null;
                 Update();
 
-                string query = $"SELECT * FROM {selectedTableName}";
+                string query = $"SELECT * FROM {selectedTableName}"; 
 
                 adapter = new SqlDataAdapter(query, conn);
                 ds = new DataSet();
+
+                SqlCommandBuilder builder = new SqlCommandBuilder(adapter);
 
                 adapter.Fill(ds);
                 dgv.DataSource = ds.Tables[0];
@@ -57,7 +62,15 @@ namespace DbAdapterAppHw
 
         private void Save_btn_Click(object sender, EventArgs e)
         {
-            adapter.Update(ds.Tables[0]);
+            try
+            {
+                adapter.Update(ds.Tables[0]);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"{ex.Message}");
+                Debug.WriteLine(ex.StackTrace);
+            }
         }
 
         private void LoadTable()
@@ -67,7 +80,7 @@ namespace DbAdapterAppHw
                 string query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
 
                 adapter = new SqlDataAdapter(query, conn);
-                ds = new DataSet { };
+                ds = new DataSet();
                 adapter.Fill(ds);
 
                 TableList.DataSource = ds.Tables[0];
